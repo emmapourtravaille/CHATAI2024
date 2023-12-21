@@ -12,15 +12,6 @@ def print_list(file_list):
     for file_name in file_list:
         print(file_name)
 
-dictionnaire_prenoms = {
-    'Chirac1': 'Jacques',
-    'Giscard dEstaing': 'Valéry',
-    'Hollande': 'François',
-    'Macron': 'Emmanuel',
-    'Mitterand': 'François',
-    'Sarkozy': 'Nicolas'
-}
-
 
 def extract_president_names(file_names):
     president_names = set()
@@ -36,6 +27,14 @@ def extract_president_names(file_names):
     return list(president_names)
 
 def associer_prenom_president(nom_complet):
+    dictionnaire_prenoms = {
+        'Chirac': 'Jacques',
+        'Giscard dEstaing': 'Valéry',
+        'Hollande': 'François',
+        'Macron': 'Emmanuel',
+        'Mitterand': 'François',
+        'Sarkozy': 'Nicolas'
+    }
     # Utiliser le nom complet comme clé dans le dictionnaire
     nom = nom_complet.split('.')[0]  # Exclure l'extension du fichier
     prenom = dictionnaire_prenoms.get(nom, '')
@@ -260,3 +259,4 @@ def calculer_vecteur_tf_idf_question(mots_question, scores_tf_corpus, scores_idf
             vecteur_tf_idf_question.append(0)
 
     return vecteur_tf_idf_question
+t

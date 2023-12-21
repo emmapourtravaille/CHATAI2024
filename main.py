@@ -131,3 +131,4 @@ print("Termes de la question présents dans le corpus :", termes_communs)
 # Calculer le vecteur TF-IDF pour les termes de la question
 vecteur_tf_idf_question = calculer_vecteur_tf_idf_question(mots_question, scores_tf_corpus, scores_idf_corpus, mots_uniques)
 print("Vecteur TF-IDF de la question :", vecteur_tf_idf_question)
+t

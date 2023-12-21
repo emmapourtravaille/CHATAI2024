@@ -259,3 +259,4 @@ def calculer_vecteur_tf_idf_question(mots_question, scores_tf_corpus, scores_idf
             vecteur_tf_idf_question.append(0)
 
     return vecteur_tf_idf_question
+t

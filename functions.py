@@ -207,59 +207,44 @@ def word_with_max_tf_idf(tf_idf_matrix, unique_words):
 
     return words_max_tf_idf
 
+
 def most_repeated_words_chirac(tf_idf_matrix, unique_words, president_index_chirac):
+    # Ensure president_index_chirac is a valid index
+    if not 0 <= president_index_chirac < len(tf_idf_matrix[0]):
+        print("Invalid president index.")
+        return []
+
     occurrences = [(tf_idf_matrix[i][president_index_chirac], unique_words[i]) for i in range(len(tf_idf_matrix))]
     occurrences.sort(reverse=True)
     most_repeated_words = [word for score, word in occurrences if score != 0]
 
     return most_repeated_words
 
-def president_talking_about_word(tf_idf_matrix, unique_words, president_names, word):
-    # Check if the word is present in the list of unique words
-    if word not in unique_words:
-        print(f"The word '{word}' is not in the list of unique words.")
+
+def presidents_speaking_about_nation(tf_idf_matrix, unique_words, president_names):
+    if 'nation' not in unique_words:
         return None
 
-    # Get the index of the word in the list of unique words
-    index_word = unique_words.index(word)
+    index_nation = unique_words.index('nation')
 
-    # Check that the index of the word is in the range of matrix indices
-    if 0 <= index_word < len(tf_idf_matrix):
-
-        # Retrieve occurrences of the word for each president
-        occurrences = [(tf_idf_matrix[index_word][j], president_names[j]) for j in range(len(tf_idf_matrix[0]))]
-
-        # Check that the indices of the presidents are in the range
-        occurrences = [(score, president) for score, president in occurrences if 0 <= president < len(president_names)]
-
-        # Sort occurrences in descending order
-        occurrences.sort(reverse=True)
-
-        # Display occurrences of each president
-        print(f"\nOccurrences of the word '{word}' by president:\n")
-        for score, president in occurrences:
-            print(f"{president}: {score}")
-
-        if occurrences:
-            # Get the president who repeated the word the most
-            president_max_occurrences = occurrences[0][1]
-            max_occurrences = occurrences[0][0]
-
-            print(f"\nThe president who spoke the most about the word '{word}' is: {president_max_occurrences} with {max_occurrences} occurrences.")
-            return president_max_occurrences, max_occurrences
+    occurrences = {}
+    for i, president in enumerate(president_names):
+        # Check if the index is within the bounds of the matrix
+        if index_nation < len(tf_idf_matrix) and i < len(tf_idf_matrix[index_nation]):
+            occurrences[president] = tf_idf_matrix[index_nation][i]
         else:
-            print(f"No occurrences found for the word '{word}'.")
-            return None
-    else:
-        print(f"Index of the word '{word}' out of range.")
-        return None
+            occurrences[president] = 0
 
-def presidents_talking_about_climate_ecology(tf_idf_matrix, unique_words, climate_ecology_words):
-    index_words = [unique_words.index(word) for word in climate_ecology_words]
+    sorted_presidents = sorted(occurrences.items(), key=lambda x: x[1], reverse=True)
+    return sorted_presidents
+def presidents_talking_about_climate_ecology(tf_idf_matrix, unique_words, climate_ecology_words, president_names):
+    index_words = []
+    for word in climate_ecology_words:
+        if word in unique_words:
+            index_words.append(unique_words.index(word))
     president_scores = {president: sum(tf_idf_matrix[i][j] for i in index_words) for j, president in enumerate(president_names)}
     sorted_presidents = sorted(president_scores.items(), key=lambda x: x[1], reverse=True)
     return sorted_presidents
-
 def analyze_question(question):
     # Convert the question to lowercase
     question = question.lower()

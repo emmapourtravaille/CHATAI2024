@@ -67,27 +67,28 @@ print(max_tf_idf_word)
 
 # Find President Chirac and the most repeated words by him
 index_chirac = list(president_names).index('Chirac')
-most_repeated_words_chirac = most_repeated_words_chirac(tf_idf_matrix, unique_words, index_chirac)
-print("\nWord(s) most repeated by President Chirac (excluding non-important words):\n")
-print(most_repeated_words_chirac)
+most_repeated_words = most_repeated_words_chirac(tf_idf_matrix, unique_words, index_chirac)
+print("\nMost repeated words by Chirac:\n", most_repeated_words)
 
 # Find the president who talked the most about the word 'nation'
-president_word_results = president_talking_about_word(tf_idf_matrix, unique_words, president_names, 'nation')
-
-# Check if the function returned a value
-if president_word_results is not None:
-    president_max_occurrences, max_occurrences = president_word_results
-    print(f"\nThe president who talked the most about the word 'nation' is: {president_max_occurrences} with {max_occurrences} occurrences.")
+presidents_nation = presidents_speaking_about_nation(tf_idf_matrix, unique_words, president_names)
+if presidents_nation:
+    print("\nPresident(s) who spoke about 'nation':\n")
+    for president, occurrences in presidents_nation:
+        print(f"{president}: {occurrences}")
 else:
-    print("No results available.")
+    print("No data on 'nation' in the speeches.")
 
-# Find presidents talking about climate and/or ecology
+# Define words related to climate and ecology
 climate_ecology_words = ['climate', 'ecology']
-presidents_climate_ecology = presidents_talking_about_climate_ecology(tf_idf_matrix, unique_words, climate_ecology_words)
-print("\nPresident(s) talking about climate and/or ecology:\n")
-for president, score in presidents_climate_ecology:
-    print(f"{president}: {score}")
+presidents_climate_ecology = presidents_talking_about_climate_ecology(tf_idf_matrix, unique_words,climate_ecology_words, president_names)
 
+if presidents_climate_ecology:
+    print("\nPresident(s) talking about climate and/or ecology:\n")
+    for president, score in presidents_climate_ecology:
+        print(f"{president}: {score}")
+else:
+    print("No data on 'climate' or 'ecology' in the speeches.")
 # Example of using the analyze_question function
 question = "Which presidents have talked about the Nation?"
 question_words = analyze_question(question)

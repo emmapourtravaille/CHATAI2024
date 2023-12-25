@@ -1,7 +1,7 @@
 import os
 import string
 import math
-def list_of_files(directory, extension):
+def list_of_files(directory, extension):  #Liste tous les fichiers avec une certaine extension dans un répertoire donné
     files_names = []
     for filename in os.listdir(directory):
         if filename.endswith(extension):
@@ -23,7 +23,10 @@ def extract_president_names(file_names):
         parts = name_without_extension.split('_')
         if len(parts) >= 2:
             president_name = parts[1]
+
+            president_name = ''.join([char for char in president_name if not char.isdigit()])
             president_names.add(president_name)
+
     return list(president_names)
 
 def associer_prenom_president(nom_complet):
@@ -42,7 +45,6 @@ def associer_prenom_president(nom_complet):
     # Si le prénom est trouvé, retourner le nom complet associé
     if prenom:
         return prenom, nom_complet
-
     # Gérer manuellement les cas spécifiques
     if "Mitterrand" in nom:
         return "François", nom_complet
@@ -71,23 +73,23 @@ def afficher_liste_noms_presidents(file_names):
 def convertir_texte_minuscules(directory, extension, output_directory):
     for filename in os.listdir(directory):
         if filename.endswith(extension):
-            with open(f"{directory}/{filename}", 'r') as input_file:
+            with open(f"{directory}/{filename}", 'r', encoding='utf-8') as input_file:
                 contenu = input_file.read()
 
             contenu_minuscules = "".join([chr(ord(char) + 32) if 'A' <= char <= 'Z' else char for char in contenu])
 
-            with open(f"{output_directory}/{filename}", 'w') as output_file:
+            with open(f"{output_directory}/{filename}", 'w', encoding='utf-8') as output_file:
                 output_file.write(contenu_minuscules)
 def supprimer_ponctuation_et_traiter_special(directory):
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
 
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             contenu = file.read()
 
         contenu_traite = ''.join([' ' if char in string.punctuation and char not in ["'", "-"] else char for char in contenu])
 
-        with open(file_path, 'w') as file:
+        with open(file_path, 'w', encoding='utf-8') as file:
             file.write(contenu_traite)
 
 
@@ -167,11 +169,14 @@ def calculer_tf_idf_matrix(cleaned_directory, extension):
         with open(file_path, 'r', encoding='utf-8') as file:
             contenu = file.read()
 
-        occurrences_fichier = calculer_occurrences_mots(contenu)
+        if len(contenu.split()) == 0:
+            tf_idf_vector = [0] * len(mots_uniques)
+        else:
+            occurrences_fichier = calculer_occurrences_mots(contenu)
+
 
         # Calculer le vecteur TF-IDF pour chaque document
-        tf_idf_vector = [occurrences_fichier.get(mot, 0) / len(contenu.split()) * score_idf.get(mot, 0)
-                         for mot in mots_uniques]
+            tf_idf_vector = [occurrences_fichier.get(mot, 0) / len(contenu.split()) * score_idf.get(mot, 0) for mot in mots_uniques]
 
         tf_idf_matrix.append(tf_idf_vector)
 
@@ -209,12 +214,45 @@ def mots_plus_repetes_chirac(tf_idf_matrix, mots_uniques, president_index_chirac
     return mots_plus_repetes
 
 
-def occurrences_mot_president(tf_idf_matrix, mots_uniques, mot):
-    index_mot = mots_uniques.index(mot)
-    occurrences = [(tf_idf_matrix[index_mot][j], president_names[j]) for j in range(len(tf_idf_matrix[0]))]
-    occurrences.sort(reverse=True)
-    return occurrences
+def president_parlant_de_mot(tf_idf_matrix, mots_uniques, president_names, mot):
+    # Vérifier si le mot est présent dans la liste des mots uniques
+    if mot not in mots_uniques:
+        print(f"Le mot '{mot}' n'est pas dans la liste des mots uniques.")
+        return None
 
+    # Obtenir l'index du mot dans la liste des mots uniques
+    index_mot = mots_uniques.index(mot)
+
+    # Vérifier que l'index du mot est dans la plage des indices de la matrice
+    if 0 <= index_mot < len(tf_idf_matrix):
+
+        # Récupérer les occurrences du mot pour chaque président
+        occurrences = [(tf_idf_matrix[index_mot][j], president_names[j]) for j in range(len(tf_idf_matrix[0]))]
+
+        # Vérifier que les indices des présidents sont dans la plage
+        occurrences = [(score, president) for score, president in occurrences if 0 <= president < len(president_names)]
+
+        # Trier les occurrences par ordre décroissant
+        occurrences.sort(reverse=True)
+
+        # Afficher les occurrences de chaque président
+        print(f"\nOccurrences du mot '{mot}' par président :\n")
+        for score, president in occurrences:
+            print(f"{president}: {score}")
+
+        if occurrences:
+            # Obtenir le président qui a répété le mot le plus de fois
+            president_max_occurrences = occurrences[0][1]
+            max_occurrences = occurrences[0][0]
+
+            print(f"\nLe président qui a le plus parlé du mot '{mot}' est : {president_max_occurrences} avec {max_occurrences} occurrences.")
+            return president_max_occurrences, max_occurrences
+        else:
+            print(f"Aucune occurrence trouvée pour le mot '{mot}'.")
+            return None
+    else:
+        print(f"Index du mot '{mot}' hors de la plage.")
+        return None
 def presidents_parlant_climat_ecologie(tf_idf_matrix, mots_uniques, mots_climat_ecologie):
     index_mots = [mots_uniques.index(mot) for mot in mots_climat_ecologie]
     president_scores = {president: sum(tf_idf_matrix[i][j] for i in index_mots) for j, president in enumerate(president_names)}
@@ -223,7 +261,7 @@ def presidents_parlant_climat_ecologie(tf_idf_matrix, mots_uniques, mots_climat_
 
 
 
-def tokeniser_question(question):
+def analyser_question(question):
     # Convertir la question en minuscules
     question = question.lower()
 
@@ -231,31 +269,72 @@ def tokeniser_question(question):
     question = ''.join([char if char not in string.punctuation else ' ' for char in question])
 
     # Tokeniser la question en mots
-    mots = question.split()
+    mots_questions = question.split()
 
-    return mots
+    return mots_questions
 
-def trouver_termes_dans_corpus(mots_question, mots_corpus):
-    termes_communs = set(mots_question).intersection(mots_corpus)
-    return list(termes_communs)
+def trouver_termes_pertinents(question_tokenisee, mots_uniques_corpus):
+    """
+    Trouve et retourne les termes de la question qui sont également présents dans le corpus.
+    """
+    termes_pertinents = set(question_tokenisee).intersection(mots_uniques_corpus)
+    return list(termes_pertinents)
 
-
-def calculer_vecteur_tf_idf_question(mots_question, scores_tf_corpus, scores_idf_corpus, mots_corpus):
+def calculer_vecteur_tf_idf_question(question_tokenisee, score_idf_corpus, mots_uniques_corpus):
+    """
+    Calcule le vecteur TF-IDF pour la question basée sur les scores IDF du corpus.
+    """
     vecteur_tf_idf_question = []
-
-    for mot_corpus in mots_corpus:
-        if mot_corpus in mots_question:
-            # Calculer le score TF pour le mot dans la question
-            tf_question = mots_question.count(mot_corpus)
-
-            # Récupérer le score IDF déjà calculé pour le mot dans le corpus
-            idf_corpus = scores_idf_corpus.get(mot_corpus, 0)
-
-            # Calculer le score TF-IDF pour le mot dans la question
-            tf_idf_question = tf_question * idf_corpus
-            vecteur_tf_idf_question.append(tf_idf_question)
-        else:
-            # Le mot du corpus n'est pas présent dans la question, mettre 0
-            vecteur_tf_idf_question.append(0)
-
+    for mot in mots_uniques_corpus:
+        tf = question_tokenisee.count(mot)
+        idf = score_idf_corpus.get(mot, 0)
+        vecteur_tf_idf_question.append(tf * idf)
     return vecteur_tf_idf_question
+
+
+def produit_scalaire(A, B):
+    """
+    Calcule et retourne le produit scalaire entre deux vecteurs A et B.
+    """
+    if len(A) != len(B):
+        raise ValueError("Les vecteurs doivent avoir la même dimension.")
+
+    return sum(a * b for a, b in zip(A, B))
+
+
+def norme_vecteur(A):
+    """
+    Calcule et retourne la norme d'un vecteur A.
+    """
+    return math.sqrt(sum(a ** 2 for a in A))
+
+
+def similarite_cosinus(A, B):
+    """
+    Calcule et retourne la similarité cosinus entre deux vecteurs A et B.
+    """
+    produit = produit_scalaire(A, B)
+    norme_A = norme_vecteur(A)
+    norme_B = norme_vecteur(B)
+
+    if norme_A == 0 or norme_B == 0:
+        return 0
+
+    return produit / (norme_A * norme_B)
+
+
+# Exemple d'utilisation :
+
+# Vecteurs d'exemple
+vecteur_A = [1, 2, 3]
+vecteur_B = [4, 5, 6]
+
+# Calcul de la similarité cosinus
+resultat_similarite_cosinus = similarite_cosinus(vecteur_A, vecteur_B)
+print("Similarité cosinus:", resultat_similarite_cosinus)
+
+def generer_reponse(index_document, documents):
+    """
+    Génère une réponse basée sur le document le plus pertinent trouvé.
+    """
+    return documents[index_document]

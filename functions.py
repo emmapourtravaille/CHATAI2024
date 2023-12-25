@@ -1,7 +1,7 @@
 import os
 import string
 import math
-def list_of_files(directory, extension):  #Liste tous les fichiers avec une certaine extension dans un répertoire donné
+def list_of_files(directory, extension):
     files_names = []
     for filename in os.listdir(directory):
         if filename.endswith(extension):
@@ -12,14 +12,13 @@ def print_list(file_list):
     for file_name in file_list:
         print(file_name)
 
-
 def extract_president_names(file_names):
     president_names = set()
     for file_name in file_names:
-        # Extraire le nom du fichier sans l'extension
+        # Extract the file name without the extension
         name_without_extension = file_name.split('.')[0]
 
-        # Extraire le nom complet après le premier '_'
+        # Extract the full name after the first '_'
         parts = name_without_extension.split('_')
         if len(parts) >= 2:
             president_name = parts[1]
@@ -29,8 +28,8 @@ def extract_president_names(file_names):
 
     return list(president_names)
 
-def associer_prenom_president(nom_complet):
-    dictionnaire_prenoms = {
+def associate_first_name_to_president(full_name):
+    first_names_dictionary = {
         'Chirac': 'Jacques',
         'Giscard dEstaing': 'Valéry',
         'Hollande': 'François',
@@ -38,303 +37,299 @@ def associer_prenom_president(nom_complet):
         'Mitterand': 'François',
         'Sarkozy': 'Nicolas'
     }
-    # Utiliser le nom complet comme clé dans le dictionnaire
-    nom = nom_complet.split('.')[0]  # Exclure l'extension du fichier
-    prenom = dictionnaire_prenoms.get(nom, '')
+    # Use the full name as the key in the dictionary
+    last_name = full_name.split('.')[0]  # Exclude the file extension
+    first_name = first_names_dictionary.get(last_name, '')
 
-    # Si le prénom est trouvé, retourner le nom complet associé
-    if prenom:
-        return prenom, nom_complet
-    # Gérer manuellement les cas spécifiques
-    if "Mitterrand" in nom:
-        return "François", nom_complet
+    # If the first name is found, return the associated full name
+    if first_name:
+        return first_name, full_name
+    # Handle specific cases manually
+    if "Mitterrand" in last_name:
+        return "François", full_name
 
-    if "Chirac" in nom:
-        return "Jacques", nom_complet
+    if "Chirac" in last_name:
+        return "Jacques", full_name
 
-    # Si le prénom n'est pas trouvé, retourner simplement le nom complet tel quel
-    print("Aucun prénom associé pour :", nom_complet)
-    return nom_complet
+    # If the first name is not found, simply return the full name as is
+    print("No first name associated for:", full_name)
+    return full_name
 
-def afficher_liste_noms_presidents(file_names):
+def display_list_of_president_names(file_names):
     president_names = extract_president_names(file_names)
     cleaned_president_names = set()
 
     for name in president_names:
-        # Retirer les chiffres à la fin du nom
+        # Remove digits at the end of the name
         cleaned_name = ''.join([char for char in name if not char.isdigit()])
         cleaned_president_names.add(cleaned_name)
 
     unique_president_names = list(cleaned_president_names)
 
-    print("\n\-/    Liste des noms des présidents (sans doublons) :   \-/\n ")
+    print("\n\-/ List of president names (without duplicates): \-/\n ")
     print_list(unique_president_names)
 
-def convertir_texte_minuscules(directory, extension, output_directory):
+def convert_to_lowercase(directory, extension, output_directory):
     for filename in os.listdir(directory):
         if filename.endswith(extension):
             with open(f"{directory}/{filename}", 'r', encoding='utf-8') as input_file:
-                contenu = input_file.read()
+                content = input_file.read()
 
-            contenu_minuscules = "".join([chr(ord(char) + 32) if 'A' <= char <= 'Z' else char for char in contenu])
+            lowercase_content = "".join([chr(ord(char) + 32) if 'A' <= char <= 'Z' else char for char in content])
 
             with open(f"{output_directory}/{filename}", 'w', encoding='utf-8') as output_file:
-                output_file.write(contenu_minuscules)
-def supprimer_ponctuation_et_traiter_special(directory):
+                output_file.write(lowercase_content)
+
+def remove_punctuation_and_handle_special(directory):
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
 
         with open(file_path, 'r', encoding='utf-8') as file:
-            contenu = file.read()
+            content = file.read()
 
-        contenu_traite = ''.join([' ' if char in string.punctuation and char not in ["'", "-"] else char for char in contenu])
+        treated_content = ''.join([' ' if char in string.punctuation and char not in ["'", "-"] else char for char in content])
 
         with open(file_path, 'w', encoding='utf-8') as file:
-            file.write(contenu_traite)
+            file.write(treated_content)
 
 
-def calculer_occurrences_mots(texte):
-    occ = {}
-    mots = texte.split()
+def calculate_word_occurrences(text):
+    occurrences = {}
+    words = text.split()
 
-    for mot in mots:
-        mot = mot.strip(string.punctuation).lower()  # Convert to lowercase
-        occ[mot] = occ.get(mot, 0) + 1
+    for word in words:
+        word = word.strip(string.punctuation).lower()  # Convert to lowercase
+        occurrences[word] = occurrences.get(word, 0) + 1
 
-    return occ
+    return occurrences
 
 
-def calculer_occurrences_fichiers(cleaned_directory, extension):
-    occ_globales = {}
+def calculate_file_occurrences(cleaned_directory, extension):
+    global_occurrences = {}
 
     for filename in os.listdir(cleaned_directory):
         if filename.endswith(extension):
             file_path = os.path.join(cleaned_directory, filename)
 
             with open(file_path, 'r', encoding='utf-8') as file:
-                contenu = file.read()
+                content = file.read()
 
-            occ_fichier = calculer_occurrences_mots(contenu)
+            file_occurrences = calculate_word_occurrences(content)
 
-            for mot, occurrence in occ_fichier.items():
-                occ_globales[mot] = occ_globales.get(mot, 0) + occurrence
+            for word, occurrence in file_occurrences.items():
+                global_occurrences[word] = global_occurrences.get(word, 0) + occurrence
 
-    return occ_globales
+    return global_occurrences
 
-def calculer_score_idf(cleaned_directory, extension):
-    nb_documents_contenant_mot = {}
-    nb_documents_total = 0
 
-    # Compter le nombre de documents contenant chaque mot
+def calculate_idf_score(cleaned_directory, extension):
+    documents_containing_word_count = {}
+    total_documents = 0
+
+    # Count the number of documents containing each word
     for filename in os.listdir(cleaned_directory):
         if filename.endswith(extension):
-            nb_documents_total += 1
+            total_documents += 1
 
             file_path = os.path.join(cleaned_directory, filename)
 
             with open(file_path, 'r', encoding='utf-8') as file:
-                contenu = file.read()
+                content = file.read()
 
-            mots_uniques = set(contenu.split())
+            unique_words = set(content.split())
 
-            for mot in mots_uniques:
-                nb_documents_contenant_mot[mot] = nb_documents_contenant_mot.get(mot, 0) + 1
+            for word in unique_words:
+                documents_containing_word_count[word] = documents_containing_word_count.get(word, 0) + 1
 
-    # Calculer le score IDF pour chaque mot
-    score_idf = {}
-    for mot, nb_documents_contenant in nb_documents_contenant_mot.items():
-        score_idf[mot] = round(math.log(nb_documents_total / (1 + nb_documents_contenant)))  # Arrondi en entier
+    # Calculate IDF score for each word
+    idf_score = {}
+    for word, documents_containing_count in documents_containing_word_count.items():
+        idf_score[word] = round(math.log(total_documents / (1 + documents_containing_count)))  # Rounded to integer
 
-    return score_idf
+    return idf_score
 
-def calculer_tf_idf_matrix(cleaned_directory, extension):
-    # Step 1: Calculer la fréquence du terme (TF) pour chaque mot dans chaque document
-    occurrences_globales = calculer_occurrences_fichiers(cleaned_directory, extension)
 
-    # Step 2: Calculer le score IDF pour chaque mot
-    score_idf = calculer_score_idf(cleaned_directory, extension)
+def calculate_tf_idf_matrix(cleaned_directory, extension):
+    # Step 1: Calculate the Term Frequency (TF) for each word in each document
+    global_occurrences = calculate_file_occurrences(cleaned_directory, extension)
 
-    # Liste des fichiers dans le répertoire
+    # Step 2: Calculate the IDF score for each word
+    idf_score = calculate_idf_score(cleaned_directory, extension)
+
+    # List of files in the directory
     files_names = [filename for filename in os.listdir(cleaned_directory) if filename.endswith(extension)]
 
-    # Liste des mots uniques
-    mots_uniques = list(occurrences_globales.keys())
+    # List of unique words
+    unique_words = list(global_occurrences.keys())
 
-    # Step 3: Calculer la matrice TF-IDF
+    # Step 3: Calculate the TF-IDF matrix
     tf_idf_matrix = []
 
     for filename in files_names:
         file_path = os.path.join(cleaned_directory, filename)
 
         with open(file_path, 'r', encoding='utf-8') as file:
-            contenu = file.read()
+            content = file.read()
 
-        if len(contenu.split()) == 0:
-            tf_idf_vector = [0] * len(mots_uniques)
+        if len(content.split()) == 0:
+            tf_idf_vector = [0] * len(unique_words)
         else:
-            occurrences_fichier = calculer_occurrences_mots(contenu)
+            file_occurrences = calculate_word_occurrences(content)
 
-
-        # Calculer le vecteur TF-IDF pour chaque document
-            tf_idf_vector = [occurrences_fichier.get(mot, 0) / len(contenu.split()) * score_idf.get(mot, 0) for mot in mots_uniques]
+            # Calculate the TF-IDF vector for each document
+            tf_idf_vector = [file_occurrences.get(word, 0) / len(content.split()) * idf_score.get(word, 0) for word in unique_words]
 
         tf_idf_matrix.append(tf_idf_vector)
 
-    # Step 4: Retourner la matrice TF-IDF
+    # Step 4: Return the TF-IDF matrix
     return tf_idf_matrix
 
-def afficher_mots_non_importants(tf_idf_matrix, mots_uniques):
-    mots_occurrences = {word: [doc[i] for doc in tf_idf_matrix] for i, word in enumerate(mots_uniques)}
-    mots_non_importants = [word for word, tfidf_list in mots_occurrences.items() if all(tfidf == 0 for tfidf in tfidf_list)]
+def display_unimportant_words(tf_idf_matrix, unique_words):
+    words_occurrences = {word: [doc[i] for doc in tf_idf_matrix] for i, word in enumerate(unique_words)}
+    unimportant_words = [word for word, tfidf_list in words_occurrences.items() if all(tfidf == 0 for tfidf in tfidf_list)]
 
-    return mots_non_importants
+    return unimportant_words
 
-def mots_moins_importants(tf_idf_matrix, mots_uniques):
-    mots_non_importants = []
+def less_important_words(tf_idf_matrix, unique_words):
+    unimportant_words = []
 
-    # Parcourez les colonnes de la matrice TF-IDF (chaque document)
+    # Iterate through the columns of the TF-IDF matrix (each document)
     for j in range(len(tf_idf_matrix[0])):
-        # Vérifiez si tous les scores TF-IDF pour un mot donné dans tous les documents sont égaux à zéro
+        # Check if all TF-IDF scores for a given word in all documents are equal to zero
         if all(tf_idf_matrix[i][j] == 0 for i in range(len(tf_idf_matrix))):
-            mots_non_importants.append(j)
+            unimportant_words.append(j)
 
-    return mots_non_importants
+    return unimportant_words
 
-def mot_max_tf_idf(tf_idf_matrix, mots_uniques):
+def word_with_max_tf_idf(tf_idf_matrix, unique_words):
     max_indices = [max(range(len(tf_idf_matrix)), key=lambda i: tf_idf_matrix[i][j]) for j in range(len(tf_idf_matrix[0]))]
-    mots_max_tf_idf = [mots_uniques[i] for i in max_indices]
+    words_max_tf_idf = [unique_words[i] for i in max_indices]
 
-    return mots_max_tf_idf
+    return words_max_tf_idf
 
-def mots_plus_repetes_chirac(tf_idf_matrix, mots_uniques, president_index_chirac):
-    occurences = [(tf_idf_matrix[i][president_index_chirac], mots_uniques[i]) for i in range(len(tf_idf_matrix))]
-    occurences.sort(reverse=True)
-    mots_plus_repetes = [mot for score, mot in occurences if score != 0]
+def most_repeated_words_chirac(tf_idf_matrix, unique_words, president_index_chirac):
+    occurrences = [(tf_idf_matrix[i][president_index_chirac], unique_words[i]) for i in range(len(tf_idf_matrix))]
+    occurrences.sort(reverse=True)
+    most_repeated_words = [word for score, word in occurrences if score != 0]
 
-    return mots_plus_repetes
+    return most_repeated_words
 
-
-def president_parlant_de_mot(tf_idf_matrix, mots_uniques, president_names, mot):
-    # Vérifier si le mot est présent dans la liste des mots uniques
-    if mot not in mots_uniques:
-        print(f"Le mot '{mot}' n'est pas dans la liste des mots uniques.")
+def president_talking_about_word(tf_idf_matrix, unique_words, president_names, word):
+    # Check if the word is present in the list of unique words
+    if word not in unique_words:
+        print(f"The word '{word}' is not in the list of unique words.")
         return None
 
-    # Obtenir l'index du mot dans la liste des mots uniques
-    index_mot = mots_uniques.index(mot)
+    # Get the index of the word in the list of unique words
+    index_word = unique_words.index(word)
 
-    # Vérifier que l'index du mot est dans la plage des indices de la matrice
-    if 0 <= index_mot < len(tf_idf_matrix):
+    # Check that the index of the word is in the range of matrix indices
+    if 0 <= index_word < len(tf_idf_matrix):
 
-        # Récupérer les occurrences du mot pour chaque président
-        occurrences = [(tf_idf_matrix[index_mot][j], president_names[j]) for j in range(len(tf_idf_matrix[0]))]
+        # Retrieve occurrences of the word for each president
+        occurrences = [(tf_idf_matrix[index_word][j], president_names[j]) for j in range(len(tf_idf_matrix[0]))]
 
-        # Vérifier que les indices des présidents sont dans la plage
+        # Check that the indices of the presidents are in the range
         occurrences = [(score, president) for score, president in occurrences if 0 <= president < len(president_names)]
 
-        # Trier les occurrences par ordre décroissant
+        # Sort occurrences in descending order
         occurrences.sort(reverse=True)
 
-        # Afficher les occurrences de chaque président
-        print(f"\nOccurrences du mot '{mot}' par président :\n")
+        # Display occurrences of each president
+        print(f"\nOccurrences of the word '{word}' by president:\n")
         for score, president in occurrences:
             print(f"{president}: {score}")
 
         if occurrences:
-            # Obtenir le président qui a répété le mot le plus de fois
+            # Get the president who repeated the word the most
             president_max_occurrences = occurrences[0][1]
             max_occurrences = occurrences[0][0]
 
-            print(f"\nLe président qui a le plus parlé du mot '{mot}' est : {president_max_occurrences} avec {max_occurrences} occurrences.")
+            print(f"\nThe president who spoke the most about the word '{word}' is: {president_max_occurrences} with {max_occurrences} occurrences.")
             return president_max_occurrences, max_occurrences
         else:
-            print(f"Aucune occurrence trouvée pour le mot '{mot}'.")
+            print(f"No occurrences found for the word '{word}'.")
             return None
     else:
-        print(f"Index du mot '{mot}' hors de la plage.")
+        print(f"Index of the word '{word}' out of range.")
         return None
-def presidents_parlant_climat_ecologie(tf_idf_matrix, mots_uniques, mots_climat_ecologie):
-    index_mots = [mots_uniques.index(mot) for mot in mots_climat_ecologie]
-    president_scores = {president: sum(tf_idf_matrix[i][j] for i in index_mots) for j, president in enumerate(president_names)}
+
+def presidents_talking_about_climate_ecology(tf_idf_matrix, unique_words, climate_ecology_words):
+    index_words = [unique_words.index(word) for word in climate_ecology_words]
+    president_scores = {president: sum(tf_idf_matrix[i][j] for i in index_words) for j, president in enumerate(president_names)}
     sorted_presidents = sorted(president_scores.items(), key=lambda x: x[1], reverse=True)
     return sorted_presidents
 
-
-
-def analyser_question(question):
-    # Convertir la question en minuscules
+def analyze_question(question):
+    # Convert the question to lowercase
     question = question.lower()
 
-    # Supprimer la ponctuation
+    # Remove punctuation
     question = ''.join([char if char not in string.punctuation else ' ' for char in question])
 
-    # Tokeniser la question en mots
-    mots_questions = question.split()
+    # Tokenize the question into words
+    question_tokens = question.split()
 
-    return mots_questions
+    return question_tokens
 
-def trouver_termes_pertinents(question_tokenisee, mots_uniques_corpus):
+def find_relevant_terms(tokenized_question, unique_words_corpus):
     """
-    Trouve et retourne les termes de la question qui sont également présents dans le corpus.
+    Finds and returns the terms in the question that are also present in the corpus.
     """
-    termes_pertinents = set(question_tokenisee).intersection(mots_uniques_corpus)
-    return list(termes_pertinents)
+    relevant_terms = set(tokenized_question).intersection(unique_words_corpus)
+    return list(relevant_terms)
 
-def calculer_vecteur_tf_idf_question(question_tokenisee, score_idf_corpus, mots_uniques_corpus):
+def calculate_vector_tf_idf_question(tokenized_question, idf_score_corpus, unique_words_corpus):
     """
-    Calcule le vecteur TF-IDF pour la question basée sur les scores IDF du corpus.
+    Calculates the TF-IDF vector for the question based on the IDF scores of the corpus.
     """
-    vecteur_tf_idf_question = []
-    for mot in mots_uniques_corpus:
-        tf = question_tokenisee.count(mot)
-        idf = score_idf_corpus.get(mot, 0)
-        vecteur_tf_idf_question.append(tf * idf)
-    return vecteur_tf_idf_question
+    tf_idf_vector_question = []
+    for word in unique_words_corpus:
+        tf = tokenized_question.count(word)
+        idf = idf_score_corpus.get(word, 0)
+        tf_idf_vector_question.append(tf * idf)
+    return tf_idf_vector_question
 
-
-def produit_scalaire(A, B):
+def dot_product(A, B):
     """
-    Calcule et retourne le produit scalaire entre deux vecteurs A et B.
+    Calculates and returns the dot product between two vectors A and B.
     """
     if len(A) != len(B):
-        raise ValueError("Les vecteurs doivent avoir la même dimension.")
+        raise ValueError("Vectors must have the same dimension.")
 
     return sum(a * b for a, b in zip(A, B))
 
-
-def norme_vecteur(A):
+def vector_norm(A):
     """
-    Calcule et retourne la norme d'un vecteur A.
+    Calculates and returns the norm of a vector A.
     """
     return math.sqrt(sum(a ** 2 for a in A))
 
-
-def similarite_cosinus(A, B):
+def cosine_similarity(A, B):
     """
-    Calcule et retourne la similarité cosinus entre deux vecteurs A et B.
+    Calculates and returns the cosine similarity between two vectors A and B.
     """
-    produit = produit_scalaire(A, B)
-    norme_A = norme_vecteur(A)
-    norme_B = norme_vecteur(B)
+    product = dot_product(A, B)
+    norm_A = vector_norm(A)
+    norm_B = vector_norm(B)
 
-    if norme_A == 0 or norme_B == 0:
+    if norm_A == 0 or norm_B == 0:
         return 0
 
-    return produit / (norme_A * norme_B)
+    return product / (norm_A * norm_B)
 
+# Example of usage:
 
-# Exemple d'utilisation :
+# Example vectors
+vector_A = [1, 2, 3]
+vector_B = [4, 5, 6]
 
-# Vecteurs d'exemple
-vecteur_A = [1, 2, 3]
-vecteur_B = [4, 5, 6]
+# Calculating cosine similarity
+cosine_similarity_result = cosine_similarity(vector_A, vector_B)
+print("Cosine similarity:", cosine_similarity_result)
 
-# Calcul de la similarité cosinus
-resultat_similarite_cosinus = similarite_cosinus(vecteur_A, vecteur_B)
-print("Similarité cosinus:", resultat_similarite_cosinus)
-
-def generer_reponse(index_document, documents):
+def generate_response(document_index, documents):
     """
-    Génère une réponse basée sur le document le plus pertinent trouvé.
+    Generates a response based on the most relevant document found.
     """
-    return documents[index_document]
+    return documents[document_index]

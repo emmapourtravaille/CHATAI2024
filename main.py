@@ -117,4 +117,4 @@ def display_menu():
     print("5. Show the name(s) of the president(s) who spoke about climate and/or ecology")
     print("0. Quit")
 
-
+t

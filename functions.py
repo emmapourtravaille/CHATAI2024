@@ -318,3 +318,4 @@ def generate_response(document_index, documents):
     Generates a response based on the most relevant document found.
     """
     return documents[document_index]
+t

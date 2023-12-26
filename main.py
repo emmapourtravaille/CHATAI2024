@@ -97,7 +97,8 @@ question_words = analyze_question(question)
 relevant_terms = find_relevant_terms(question_words, unique_words)
 print(f"\nRelevant terms in the question: {relevant_terms}")
 
-# Example of using the calculate_vector_tf_idf_question function
+# Now call calculate_vector_tf_idf_question with the correct parameters
+resultat_score_idf = calculate_vector_tf_idf_question(cleaned_directory, extension)
 tf_idf_vector_question = calculate_vector_tf_idf_question(question_words, resultat_score_idf, unique_words)
 print(f"\nTF-IDF vector of the question: {tf_idf_vector_question}")
 

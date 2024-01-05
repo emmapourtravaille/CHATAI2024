@@ -2,31 +2,27 @@ import os
 import string
 import math
 def list_of_files(directory, extension):
-    files_names = []
-    for filename in os.listdir(directory):
-        if filename.endswith(extension):
+    files_names = [] # Initialisation d'une liste vide pour les noms de fichiers
+    for filename in os.listdir(directory): # Parcours des fichiers dans le répertoire spécifié
+        if filename.endswith(extension): # Vérification de l'extension du fichier
             files_names.append(filename)
     return files_names
 
 def print_list(file_list):
     for file_name in file_list:
-        print(file_name)
+        print(file_name)  # Affiche chaque élément de la liste sur une nouvelle ligne
 
 def extract_president_names(file_names):
-    president_names = set()
-    for file_name in file_names:
-        # Extract the file name without the extension
-        name_without_extension = file_name.split('.')[0]
-
-        # Extract the full name after the first '_'
-        parts = name_without_extension.split('_')
+    president_names = set() # Initialise un ensemble pour stocker les noms des présidents uniques
+    for file_name in file_names: # Parcours de chaque nom de fichier dans la liste
+        name_without_extension = file_name.split('.')[0] # Extrait le nom de fichier sans l'extension
+        parts = name_without_extension.split('_') # Extrait le nom complet après le premier '_'
         if len(parts) >= 2:
             president_name = parts[1]
+            president_name = ''.join([char for char in president_name if not char.isdigit()]) # Récupère le nom du président (élimine les chiffres s'il y en a)
+            president_names.add(president_name) # Ajoute le nom du président à l'ensemble
 
-            president_name = ''.join([char for char in president_name if not char.isdigit()])
-            president_names.add(president_name)
-
-    return list(president_names)
+    return list(president_names) # Convertit l'ensemble en liste et la retourne
 
 def associate_first_name_to_president(full_name):
     first_names_dictionary = {
@@ -37,36 +33,31 @@ def associate_first_name_to_president(full_name):
         'Mitterand': 'François',
         'Sarkozy': 'Nicolas'
     }
-    # Use the full name as the key in the dictionary
-    last_name = full_name.split('.')[0]  # Exclude the file extension
+
+    last_name = full_name.split('.')[0]  # Exclut l'extension du fichier
     first_name = first_names_dictionary.get(last_name, '')
 
-    # If the first name is found, return the associated full name
     if first_name:
         return first_name, full_name
-    # Handle specific cases manually
-    if "Mitterrand" in last_name:
+    elif "Mitterrand" in last_name:
         return "François", full_name
-
-    if "Chirac" in last_name:
+    elif "Chirac" in last_name:
         return "Jacques", full_name
-
-    # If the first name is not found, simply return the full name as is
-    print("No first name associated for:", full_name)
-    return full_name
+    else:
+        print("No first name associated for:", full_name)
+        return "", ""  # Retourne une chaîne vide dans les cas où aucun prénom n'est associé
 
 def display_list_of_president_names(file_names):
-    president_names = extract_president_names(file_names)
-    cleaned_president_names = set()
+    president_names = extract_president_names(file_names) # Extraire les noms des présidents à partir des noms de fichiers
+    cleaned_president_names = set() # Initialiser un ensemble pour stocker les noms de présidents uniques
 
-    for name in president_names:
-        # Remove digits at the end of the name
-        cleaned_name = ''.join([char for char in name if not char.isdigit()])
+    for name in president_names:  # Parcourir chaque nom de président
+        cleaned_name = ''.join([char for char in name if not char.isdigit()])   # Supprimer les chiffres à la fin du nom
         cleaned_president_names.add(cleaned_name)
 
-    unique_president_names = list(cleaned_president_names)
+    unique_president_names = list(cleaned_president_names)   # Convertir l'ensemble en liste pour afficher
 
-    print("\n\-/ List of president names (without duplicates): \-/\n ")
+    print("\n\-/ List of president names (without duplicates): \-/\n ")   # Afficher la liste des noms de présidents sans doublons
     print_list(unique_president_names)
 
 def convert_to_lowercase(directory, extension, output_directory):
@@ -75,9 +66,9 @@ def convert_to_lowercase(directory, extension, output_directory):
             with open(f"{directory}/{filename}", 'r', encoding='utf-8') as input_file:
                 content = input_file.read()
 
-            lowercase_content = "".join([chr(ord(char) + 32) if 'A' <= char <= 'Z' else char for char in content])
+            lowercase_content = "".join([chr(ord(char) + 32) if 'A' <= char <= 'Z' else char for char in content])  # Convertir le contenu en minuscules
 
-            with open(f"{output_directory}/{filename}", 'w', encoding='utf-8') as output_file:
+            with open(f"{output_directory}/{filename}", 'w', encoding='utf-8') as output_file:   # Écrire le contenu converti dans un nouveau fichier dans le répertoire de sortie
                 output_file.write(lowercase_content)
 
 def remove_punctuation_and_handle_special(directory):
@@ -87,20 +78,19 @@ def remove_punctuation_and_handle_special(directory):
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
 
-        treated_content = ''.join([' ' if char in string.punctuation and char not in ["'", "-"] else char for char in content])
+        treated_content = ''.join([' ' if char in string.punctuation and char not in ["'", "-"] else char for char in content])   # Supprimer la ponctuation, en conservant les apostrophes et les tirets
 
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(file_path, 'w', encoding='utf-8') as file:   # Réécrire le contenu traité dans le même fichier
             file.write(treated_content)
 
 
 def calculate_word_occurrences(text):
-    occurrences = {}
-    words = text.split()
+    occurrences = {}   # Initialiser un dictionnaire pour stocker les occurrences des mots
+    words = text.split()  # Diviser le texte en mots
 
-    for word in words:
-        word = word.strip(string.punctuation).lower()  # Convert to lowercase
-        occurrences[word] = occurrences.get(word, 0) + 1
-
+    for word in words:  # Parcourir chaque mot dans la liste de mots
+        word = word.strip(string.punctuation).lower()  # Supprimer la ponctuation et convertir en minuscules
+        occurrences[word] = occurrences.get(word, 0) + 1  # Mettre à jour le compteur d'occurrences pour le mot actuel
     return occurrences
 
 
@@ -114,19 +104,19 @@ def calculate_file_occurrences(cleaned_directory, extension):
             with open(file_path, 'r', encoding='utf-8') as file:
                 content = file.read()
 
-            file_occurrences = calculate_word_occurrences(content)
+            file_occurrences = calculate_word_occurrences(content)   # Calculer les occurrences des mots dans le fichier actuel
 
-            for word, occurrence in file_occurrences.items():
+            for word, occurrence in file_occurrences.items():   # Mettre à jour les occurrences globales en tenant compte du fichier actuel
                 global_occurrences[word] = global_occurrences.get(word, 0) + occurrence
 
     return global_occurrences
 
 
 def calculate_idf_score(cleaned_directory, extension):
-    documents_containing_word_count = {}
+    documents_containing_word_count = {}  # Initialiser un dictionnaire pour compter le nombre de documents contenant chaque mot
     total_documents = 0
 
-    # Count the number of documents containing each word
+    # Compter le nombre de documents contenant chaque mot
     for filename in os.listdir(cleaned_directory):
         if filename.endswith(extension):
             total_documents += 1
@@ -138,32 +128,23 @@ def calculate_idf_score(cleaned_directory, extension):
 
             unique_words = set(content.split())
 
-            for word in unique_words:
+            for word in unique_words: # Mettre à jour le compteur pour chaque mot dans le dictionnaire global
                 documents_containing_word_count[word] = documents_containing_word_count.get(word, 0) + 1
 
-    # Calculate IDF score for each word
+    # Calculer le score IDF pour chaque mot
     idf_score = {}
     for word, documents_containing_count in documents_containing_word_count.items():
-        idf_score[word] = round(math.log(total_documents / (1 + documents_containing_count)))  # Rounded to integer
+        idf_score[word] = round(math.log(total_documents / (1 + documents_containing_count)))  # Arrondi à l'entier
 
     return idf_score
 
 
 def calculate_tf_idf_matrix(cleaned_directory, extension):
-    # Step 1: Calculate the Term Frequency (TF) for each word in each document
-    global_occurrences = calculate_file_occurrences(cleaned_directory, extension)
-
-    # Step 2: Calculate the IDF score for each word
-    idf_score = calculate_idf_score(cleaned_directory, extension)
-
-    # List of files in the directory
-    files_names = [filename for filename in os.listdir(cleaned_directory) if filename.endswith(extension)]
-
-    # List of unique words
-    unique_words = list(global_occurrences.keys())
-
-    # Step 3: Calculate the TF-IDF matrix
-    tf_idf_matrix = []
+    global_occurrences = calculate_file_occurrences(cleaned_directory, extension) # Étape 1 : Calculer la Fréquence des Termes (TF) pour chaque mot dans chaque document
+    idf_score = calculate_idf_score(cleaned_directory, extension)   # Étape 2 : Calculer le score IDF pour chaque mot
+    files_names = [filename for filename in os.listdir(cleaned_directory) if filename.endswith(extension)]  # Liste des fichiers dans le répertoire
+    unique_words = list(global_occurrences.keys())  # Liste des mots uniques
+    tf_idf_matrix = []  # Étape 3 : Calculer la matrice TF-IDF
 
     for filename in files_names:
         file_path = os.path.join(cleaned_directory, filename)
@@ -176,7 +157,7 @@ def calculate_tf_idf_matrix(cleaned_directory, extension):
         else:
             file_occurrences = calculate_word_occurrences(content)
 
-            # Calculate the TF-IDF vector for each document
+            # Calculer le vecteur TF-IDF pour chaque document
             tf_idf_vector = [file_occurrences.get(word, 0) / len(content.split()) * idf_score.get(word, 0) for word in unique_words]
 
         tf_idf_matrix.append(tf_idf_vector)
@@ -184,39 +165,57 @@ def calculate_tf_idf_matrix(cleaned_directory, extension):
     # Step 4: Return the TF-IDF matrix
     return tf_idf_matrix
 
+
 def display_unimportant_words(tf_idf_matrix, unique_words):
-    words_occurrences = {word: [doc[i] for doc in tf_idf_matrix] for i, word in enumerate(unique_words)}
-    unimportant_words = [word for word, tfidf_list in words_occurrences.items() if all(tfidf == 0 for tfidf in tfidf_list)]
+    num_unique_words = len(unique_words)
 
-    return unimportant_words
-
-def less_important_words(tf_idf_matrix, unique_words):
+    # Utiliser une liste pour stocker les indices des mots moins importants
     unimportant_words = []
 
-    # Iterate through the columns of the TF-IDF matrix (each document)
-    for j in range(len(tf_idf_matrix[0])):
-        # Check if all TF-IDF scores for a given word in all documents are equal to zero
-        if all(tf_idf_matrix[i][j] == 0 for i in range(len(tf_idf_matrix))):
+    for i in range(num_unique_words):
+        # Vérifier la longueur de chaque document avant d'accéder à l'indice
+        if all(len(doc) > i for doc in tf_idf_matrix):
+            # Si tous les documents ont une longueur supérieure à l'indice i, ajouter l'indice aux mots non importants
+            unimportant_words.append(i)
+
+    # Afficher les mots non importants
+    print("Indices des mots non importants :", unimportant_words)
+
+    # Utiliser ces indices pour obtenir les mots non importants
+    words_occurrences = {word: [doc[i] for doc in tf_idf_matrix if len(doc) > i] for i, word in enumerate(unique_words)
+                         if i in unimportant_words}
+
+    # Afficher les occurrences des mots non importants
+    for word, occurrences in words_occurrences.items():
+        print(f"Le mot '{word}' a des occurrences dans les documents non importants :", occurrences)
+
+
+def less_important_words(tf_idf_matrix, unique_words):
+    unimportant_words = []  # Initialiser une liste pour stocker les indices des mots moins importants
+    for j in range(len(tf_idf_matrix[0])):  # Itérer à travers les colonnes de la matrice TF-IDF (chaque document)
+        if all(tf_idf_matrix[i][j] == 0 for i in range(len(tf_idf_matrix))):  # Vérifier si tous les scores TF-IDF pour un mot donné dans tous les documents sont égaux à zéro
             unimportant_words.append(j)
 
     return unimportant_words
 
 def word_with_max_tf_idf(tf_idf_matrix, unique_words):
-    max_indices = [max(range(len(tf_idf_matrix)), key=lambda i: tf_idf_matrix[i][j]) for j in range(len(tf_idf_matrix[0]))]
-    words_max_tf_idf = [unique_words[i] for i in max_indices]
+    max_indices = [max(range(len(tf_idf_matrix)), key=lambda i: tf_idf_matrix[i][j]) for j in range(len(tf_idf_matrix[0]))] # Trouver les indices des documents avec les scores TF-IDF max pour chaque mot
+    words_max_tf_idf = [unique_words[i] for i in max_indices]   # Obtenir les mots correspondant aux indices trouvés
 
     return words_max_tf_idf
 
 
 def most_repeated_words_chirac(tf_idf_matrix, unique_words, president_index_chirac):
-    # Ensure president_index_chirac is a valid index
-    if not 0 <= president_index_chirac < len(tf_idf_matrix[0]):
+    if not 0 <= president_index_chirac < len(
+            tf_idf_matrix[0]):  # Assurer que president_index_chirac est un index valide
         print("Invalid president index.")
         return []
 
     occurrences = [(tf_idf_matrix[i][president_index_chirac], unique_words[i]) for i in range(len(tf_idf_matrix))]
     occurrences.sort(reverse=True)
-    most_repeated_words = [word for score, word in occurrences if score != 0]
+
+    # Retourner uniquement le mot le plus répété
+    most_repeated_words = [word for score, word in occurrences if score != 0][:1]
 
     return most_repeated_words
 
@@ -229,13 +228,12 @@ def presidents_speaking_about_nation(tf_idf_matrix, unique_words, president_name
 
     occurrences = {}
     for i, president in enumerate(president_names):
-        # Check if the index is within the bounds of the matrix
-        if index_nation < len(tf_idf_matrix) and i < len(tf_idf_matrix[index_nation]):
+        if index_nation < len(tf_idf_matrix) and i < len(tf_idf_matrix[index_nation]):  # Vérifier si l'index est dans les limites de la matrice
             occurrences[president] = tf_idf_matrix[index_nation][i]
         else:
             occurrences[president] = 0
 
-    sorted_presidents = sorted(occurrences.items(), key=lambda x: x[1], reverse=True)
+    sorted_presidents = sorted(occurrences.items(), key=lambda x: x[1], reverse=True)  # Trier les présidents en fonction du score TF-IDF pour le mot 'nation'
     return sorted_presidents
 def presidents_talking_about_climate_ecology(tf_idf_matrix, unique_words, climate_ecology_words, president_names):
     index_words = []
@@ -318,4 +316,3 @@ def generate_response(document_index, documents):
     Generates a response based on the most relevant document found.
     """
     return documents[document_index]
-t

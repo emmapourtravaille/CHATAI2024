@@ -50,7 +50,7 @@ while True:
                 print(f"Word occurrences in the file {filename}:")
                 print()
                 for word, count in word_counts.items():
-                    print(f"The word '{word}' appears {count} times.")
+                    print("The word '{}' appears {} times.".format(word, count))
                 print()
 
     elif choice == "5":
@@ -58,7 +58,8 @@ while True:
         corpus_directory = "./cleaned"
         idf_scores = calculate_idf_score(corpus_directory, ".txt")
         for word, score in idf_scores.items():
-            print(f"Word: {word}, IDF Score: {score}")
+            print("Word: {}, IDF Score: {}".format(word, score))
+
         print()
 
     elif choice == "6":
@@ -103,7 +104,8 @@ while True:
         unique_words = list(idf_scores.keys())
         highest_words_by_chirac = most_repeated_words_chirac(tf_idf_matrix, unique_words, president_index_chirac)
         if highest_words_by_chirac:
-            print(f"The most repeated word for Chirac (excluding unimportant words) is: {highest_words_by_chirac[0]}")
+            print("The most repeated word for Chirac (excluding unimportant words) is: {}".format(highest_words_by_chirac[0]))
+
         else:
             print("No most repeated word for Chirac found.")
 
@@ -132,7 +134,8 @@ while True:
         if result:
             print("Presidents who talked about climate and/or ecology:")
             for president, score in result:
-                print(f"{president.replace('.txt', '')}: {score}")
+                print("{}: {}".format(president.replace('.txt', ''), score))
+
         else:
             print("No president talked about climate and/or ecology or the keywords were not found.")
 

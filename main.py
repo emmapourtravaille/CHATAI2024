@@ -1,6 +1,6 @@
 import os
 from functions import *
-
+from functions2 import *
 print("\t\tWelcome to the main program!")
 while True:
     print("\n\t\t\t\t\t\tMenu")
@@ -13,13 +13,12 @@ while True:
     print("7. Display the least important words")
     print("8. Display words with the highest TF-IDF score")
     print("9. Display Chirac's most repeated word(s)")
-    print("10. Display the presidents who mentioned the 'Nation' and the one who mentioned it most frequently.")
-    print("11. Display the presidents who mentioned 'Nation' and the one who repeated it most often.")
-    print("12. Display presidents talking about 'Ecologie'")
-    print("13. Ask a question")
+    print("10. Display the presidents who mentioned 'Nation' and the one who repeated it most often.")
+    print("11. Display presidents talking about 'Ecologie'")
+    print("12. Ask a question")
     print("0. Leave")
 
-    choice = input("Please select an option (0-13): ")
+    choice = input("Please select an option (0-12): ")
 
     if choice == "1":
         print("//*** Displaying file names ***//")
@@ -93,12 +92,12 @@ while True:
             print("No words found with a high TF-IDF score.")
 
 
+
     elif choice == '9':
         print("//*** Mots les plus répétés par Chirac ***//")
         print()
         corpus_directory = "./cleaned"
-        # Assurez-vous que l'index est correct selon votre structure de données
-        president_index_chirac = 0
+        president_index_chirac = 0  # Assurez-vous que c'est le bon index pour Chirac
         tf_idf_matrix = calculate_tf_idf_matrix(corpus_directory, ".txt")
         idf_scores = calculate_idf_score(corpus_directory, ".txt")
         unique_words = list(idf_scores.keys())
@@ -110,28 +109,7 @@ while True:
 
 
     elif choice == '10':
-        print("//*** Display the presidents who mentioned 'Nation' and the one who mentioned it most frequently ***//")
-        print()
 
-        corpus_directory = "./cleaned"
-        tf_idf_matrix = calculate_tf_idf_matrix(corpus_directory, ".txt")
-        idf_scores = calculate_idf_score(corpus_directory, ".txt")
-        unique_words = list(idf_scores.keys())
-        file_list = list_of_files("./speeches-20231109", ".txt")
-        president_names = extract_president_names(file_list)
-        result = presidents_speaking_about_nation(tf_idf_matrix, unique_words, president_names)
-        if result and isinstance(result, list) and len(result) > 0:
-            if isinstance(result[0], tuple):
-                # Si le premier élément de result est un tuple
-                most_repeated_president = result[0][1].replace('.txt', '')
-                print("The president(s) who mentioned 'Nation':", result)
-                print("The president who mentioned it most frequently:", most_repeated_president)
-            else:
-                print("Unexpected result format:", result)
-        else:
-            print("No president mentioned 'Nation' or the word was not found.")
-
-    elif choice == '11':
         corpus_directory = "./cleaned"
         file_list = list_of_files("./speeches-20231109", ".txt")
         president_names = extract_president_names(file_list)
@@ -143,7 +121,8 @@ while True:
         else:
             print("No president mentioned 'Nation' or the word was not found.")
 
-    elif choice == '12':
+
+    elif choice == '11':
         print("//*** Presidents Talking about Climate and Ecology ***//")
         corpus_directory = "./cleaned"
         climate_ecology_words = ['climat', 'écologie']  # Add other relevant words
@@ -157,19 +136,41 @@ while True:
         else:
             print("No president talked about climate and/or ecology or the keywords were not found.")
 
-    elif choice == '13':
+    elif choice == '12':
         corpus_directory = "./cleaned"
+        tf_idf_matrix = calculate_tf_idf_matrix(corpus_directory, ".txt")
         idf_scores = calculate_idf_score(corpus_directory, ".txt")
+        unique_words = list(calculate_idf_score(corpus_directory, ".txt").keys())
+        president_names = list_of_files(corpus_directory, "txt")
 
-        question = input("Ask your question: ")
-        question_tokens = analyze_question(question)
+        question_user = input("\nPosez votre question: ")
+        tokens = tokenize_question(question_user)
+        terms_in_corpus = find_terms_in_corpus(tokens, idf_scores)
+        question_tf_idf = calculate_question_tf_idf(question_user, unique_words, idf_scores)
+        most_relevant_doc_index = find_most_relevant_document(tf_idf_matrix, question_tf_idf)
+        most_relevant_doc_name = president_names[most_relevant_doc_index]
 
-        term_in_corpus = find_relevant_terms(question_tokens, list(idf_scores.keys()))
-        print("Terms in the question present in the corpus:", term_in_corpus)
+        with open(os.path.join(corpus_directory, most_relevant_doc_name), 'r', encoding='utf-8') as file:
+            text = file.read()
+        highest_tf_idf_word_in_question = highest_tf_idf_word(question_tf_idf, unique_words)
+        question_starters = {
+            "Comment": "Après analyse, ",
+            "Pourquoi": "Car, ",
+            "Peux-tu": "Oui, bien sûr! ",
+        }
+        relevant_sentence = find_sentence_with_word(text, highest_tf_idf_word_in_question)
+        refined_answer = generate_formatted_response(question_user, relevant_sentence)
+        print("Document pertinent:", most_relevant_doc_name)
+        print()
+        print("Mot le plus pertinent dans la question:", highest_tf_idf_word_in_question)
+        print()
+        print("Réponse générée:", relevant_sentence)
+        print()
+        print("Réponse raffinée:", refined_answer)
 
     elif choice == "0":
-        print("GOOD BYE!")
+        print("Au revoir !")
         break
 
     else:
-        print("Invalid option. Please choose a valid option.")
+        print("Option invalide. Veuillez choisir une option valide.")

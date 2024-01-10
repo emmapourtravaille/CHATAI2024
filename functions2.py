@@ -80,17 +80,16 @@ def find_sentence_with_word(text, word):
 
 
 # 7e fonctions
-def generate_formatted_response(question, answer):
-    # Liste de propositions non exhaustives
+def generate_formatted_response(question, response):
+    """Format the response based on the form of the question"""
     question_starters = {
         "Comment": "Après analyse, ",
         "Pourquoi": "Car, ",
-        "Peux-tu": "Oui, bien sûr! ",
+        "Peux-tu": "Oui, bien sûr!"
     }
-    # Trouver le début de la question et sélectionner la réponse appropriée
-    for starter, response_starter in question_starters.items():
-        if question.startswith(starter):
-            return response_starter + answer[0].upper() + answer[1:]
 
-    # Si aucune correspondance n'est trouvée, retourner la réponse originale
-    return answer[0].upper() + answer[1:]
+    for starter, model_response in question_starters.items():
+        if question.startswith(starter):
+            return model_response + response
+
+    return response

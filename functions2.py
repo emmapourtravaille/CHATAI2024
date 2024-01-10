@@ -32,8 +32,6 @@ def calculate_question_tf_idf(question_tokens, unique_words, idf_scores):
     return question_tf_idf
 
 
-
-# 4e fonction SIMILARITE DE COSINUS
 # calcule le produit scalaire entre les deux vecteurs
 def dot_product(vector_a, vector_b):
     return sum(a * b for a, b in zip(vector_a, vector_b))
@@ -68,7 +66,7 @@ def find_most_relevant_document(tfidf_matrix, question_vector):
     return most_relevant_doc_index
 
 
-# 6e fonctions
+
 def highest_tf_idf_word(question_tf_idf, unique_words):
     highest_score_index = question_tf_idf.index(max(question_tf_idf))
     return unique_words[highest_score_index]
@@ -79,7 +77,7 @@ def find_sentence_with_word(text, word):
     return sentences[0] if sentences else ""
 
 
-# 7e fonctions
+
 def generate_formatted_response(question, response):
     """Format the response based on the form of the question"""
     question_starters = {

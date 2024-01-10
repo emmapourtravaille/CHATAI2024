@@ -1,7 +1,7 @@
 import os
 from functions import *
 from functions2 import *
-print("\t\tWelcome to the main program!")
+print("\t\tWelcome !")
 while True:
     print("\n\t\t\t\t\t\tMenu")
     print("1. Display file names")
